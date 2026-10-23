@@ -1,0 +1,23 @@
+#!/bin/sh
+# 每次刷入新固件更新版本描述；不修改用户密码、网络和无线配置。
+set -eu
+. /etc/ap8220-ap-release
+description="AP8220 AP专用固件 $FIRMWARE_VERSION"
+if [ -f /etc/openwrt_release ]; then
+	sed -i '/^DISTRIB_DESCRIPTION=/d' /etc/openwrt_release
+	printf "DISTRIB_DESCRIPTION='%s'\n" "$description" >> /etc/openwrt_release
+fi
+if [ -f /usr/lib/os-release ]; then
+	sed -i '/^OPENWRT_RELEASE=/d' /usr/lib/os-release
+	printf 'OPENWRT_RELEASE="%s"\n' "$description" >> /usr/lib/os-release
+fi
+cat > /etc/banner <<EOF
+
+AP8220 AP专用固件
+固件版本：$FIRMWARE_VERSION
+源码版本：v$SOURCE_VERSION
+管理地址：由上级路由器 DHCP 分配
+状态命令：ap8220-ap-status
+
+EOF
+exit 0

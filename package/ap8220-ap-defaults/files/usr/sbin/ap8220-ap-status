@@ -1,0 +1,19 @@
+#!/bin/sh
+# 简体中文设备状态摘要。
+. /etc/ap8220-ap-release
+printf '设备：阿里云 AP8220\n源码版本：v%s\n固件版本：%s\n' "$SOURCE_VERSION" "$FIRMWARE_VERSION"
+printf 'Lean 提交：%s\n构建时间：%s\n' "$LEAN_COMMIT" "$BUILD_DATE"
+printf '主机名：%s\n' "$(uci -q get system.@system[0].hostname)"
+printf '初始化完成：%s\n' "$(uci -q get ap8220_ap.core.initialized || printf '0')"
+printf '出厂 MAC：%s\n管理 MAC：%s\n身份来源：%s\n' "$(uci -q get ap8220_ap.core.product_mac)" "$(uci -q get ap8220_ap.core.base_mac)" "$(uci -q get ap8220_ap.core.identity_source)"
+printf '管理 IPv4：%s\n' "$(ubus call network.interface.lan status 2>/dev/null | jsonfilter -e '@["ipv4-address"][0].address')"
+printf '管理 IPv6：%s\n' "$(ubus call network.interface.lan6 status 2>/dev/null | jsonfilter -e '@["ipv6-address"][0].address')"
+printf '加速模式：%s\n' "$(uci -q get turboacc.config.fastpath)"
+printf '\n桥接设备：\n'
+ip -br link show dev br-lan
+printf '\n无线网络：\n'
+uci -q show wireless | grep -E '\.(ssid|device|network|ieee80211r|mobility_domain)='
+printf '\nNAND 分区：\n'
+grep -E '"(rootfs|rootfs1|rootfs2|usrdata)"' /proc/mtd
+printf '\nusteer 状态：\n'
+ubus call usteer remote_info 2>/dev/null || true

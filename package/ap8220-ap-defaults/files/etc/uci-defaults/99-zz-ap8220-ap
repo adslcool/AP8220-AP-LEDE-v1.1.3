@@ -1,0 +1,3 @@
+#!/bin/sh
+# 本项目升级保留初始化标记，因此不会重新覆盖用户网络设置。
+/usr/sbin/ap8220-ap-migrate && /usr/sbin/ap8220-ap-initialize

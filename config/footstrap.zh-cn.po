@@ -1,0 +1,441 @@
+# Footstrap 简体中文翻译，AP8220 AP 项目，Apache-2.0。
+msgid ""
+msgstr "Project-Id-Version: AP8220-AP-LEDE 1.1.3\nPO-Revision-Date: 2026-10-23 22:00+0800\nLast-Translator: AP8220 AP Project\nLanguage-Team: Simplified Chinese\nContent-Type: text/plain; charset=UTF-8\nLanguage: zh_CN\nMIME-Version: 1.0\nContent-Transfer-Encoding: 8bit\nPlural-Forms: nplurals=1; plural=0;\n"
+
+msgctxt "footstrap"
+msgid "Accent"
+msgstr "强调色"
+
+msgctxt "footstrap"
+msgid "As in file"
+msgstr "使用文件设置"
+
+msgid "Authorization Required"
+msgstr "需要身份验证"
+
+msgctxt "footstrap"
+msgid "Auto"
+msgstr "自动"
+
+msgctxt "footstrap"
+msgid "Auto-collapse"
+msgstr "自动收起"
+
+msgctxt "footstrap"
+msgid "Background"
+msgstr "背景"
+
+msgctxt "footstrap"
+msgid "Barely visible %s"
+msgstr "几乎不可见 %s"
+
+msgctxt "footstrap"
+msgid "Borders"
+msgstr "边框"
+
+msgid "Buffered"
+msgstr "缓冲"
+
+msgid "Cached"
+msgstr "缓存"
+
+msgctxt "footstrap"
+msgid "Cards"
+msgstr "卡片"
+
+msgctxt "footstrap"
+msgid "Choose SVG"
+msgstr "选择 SVG"
+
+msgctxt "footstrap"
+msgid "Choose image"
+msgstr "选择图片"
+
+msgctxt "footstrap"
+msgid "Cleaned before upload: removed %d unsafe element(s) and %d external reference(s)."
+msgstr "上传前已清理：移除 %d 个不安全元素和 %d 个外部引用。"
+
+msgctxt "footstrap"
+msgid "Clearly visible %s"
+msgstr "清晰可见 %s"
+
+msgid "Collapse menu"
+msgstr "收起菜单"
+
+msgctxt "footstrap"
+msgid "Colours"
+msgstr "颜色"
+
+msgctxt "footstrap"
+msgid "Compact"
+msgstr "紧凑"
+
+msgctxt "footstrap"
+msgid "Confirm reset"
+msgstr "确认重置"
+
+msgctxt "footstrap"
+msgid "Content width"
+msgstr "内容宽度"
+
+msgctxt "footstrap"
+msgid "Contrast %s:1 (WCAG AA wants %s:1 here)"
+msgstr "对比度 %s:1（此处 WCAG AA 要求为 %s:1）"
+
+msgctxt "footstrap"
+msgid "Controls"
+msgstr "控件"
+
+msgctxt "footstrap"
+msgid "Could not process the image."
+msgstr "无法处理图片。"
+
+msgctxt "footstrap"
+msgid "Could not save the default. Reload the page and try again."
+msgstr "无法保存默认设置，请刷新页面后重试。"
+
+msgctxt "footstrap"
+msgid "Danger"
+msgstr "危险"
+
+msgctxt "footstrap"
+msgid "Dark"
+msgstr "深色"
+
+msgctxt "footstrap"
+msgid "Density"
+msgstr "密度"
+
+msgctxt "footstrap"
+msgid "Dim"
+msgstr "暗淡"
+
+msgctxt "footstrap"
+msgid "Easy to read %s"
+msgstr "易于阅读 %s"
+
+msgid "Expand menu"
+msgstr "展开菜单"
+
+msgctxt "footstrap"
+msgid "File"
+msgstr "文件"
+
+msgid "Footstrap"
+msgstr "Footstrap"
+
+msgctxt "footstrap"
+msgid "Footstrap theme settings apply at once and are stored permanently in this browser."
+msgstr "Footstrap 主题设置立即生效，并保存在当前浏览器中。"
+
+msgid "Footstrap theme settings saved to the router, the login background and pattern uploads, and the Footstrap settings page"
+msgstr "保存在路由器上的 Footstrap 主题设置、登录背景与图案上传，以及 Footstrap 设置页面"
+
+msgid "Go to firmware upgrade..."
+msgstr "前往固件升级…"
+
+msgid "Go to password configuration..."
+msgstr "前往密码设置…"
+
+msgctxt "footstrap"
+msgid "Good"
+msgstr "正常"
+
+msgctxt "footstrap"
+msgid "Hard to read %s — large text only"
+msgstr "较难阅读 %s，仅适用于大号文字"
+
+msgctxt "footstrap"
+msgid "Interface"
+msgstr "界面"
+
+msgid "Invalid username and/or password! Please try again."
+msgstr "用户名或密码错误，请重试！"
+
+msgid "JavaScript required!"
+msgstr "需要 JavaScript！"
+
+msgctxt "footstrap"
+msgid "Keep open"
+msgstr "保持展开"
+
+msgctxt "footstrap"
+msgid "Large"
+msgstr "宽松"
+
+msgctxt "footstrap"
+msgid "Layout"
+msgstr "布局"
+
+msgctxt "footstrap"
+msgid "Light"
+msgstr "浅色"
+
+msgid "Log in"
+msgstr "登录"
+
+msgid "Log out"
+msgstr "退出登录"
+
+msgid "Lua compatibility mode active"
+msgstr "Lua 兼容模式已启用"
+
+msgid "Memory"
+msgstr "内存"
+
+msgid "Menu"
+msgstr "菜单"
+
+msgid "No changes to settings will be stored and are lost after rebooting. This mode should only be used to install a firmware upgrade"
+msgstr "设置修改不会保存，重启后将丢失。此模式仅应用于安装固件升级。"
+
+msgctxt "footstrap"
+msgid "No pages found"
+msgstr "未找到页面"
+
+msgid "No password set!"
+msgstr "尚未设置密码！"
+
+msgctxt "footstrap"
+msgid "Normal"
+msgstr "标准"
+
+msgctxt "footstrap"
+msgid "Off"
+msgstr "关闭"
+
+msgctxt "footstrap"
+msgid "Pages"
+msgstr "页面"
+
+msgctxt "footstrap"
+msgid "Palette"
+msgstr "配色"
+
+msgid "Password"
+msgstr "密码"
+
+msgctxt "footstrap"
+msgid "Pattern"
+msgstr "图案"
+
+msgctxt "footstrap"
+msgid "Please choose an SVG file."
+msgstr "请选择 SVG 文件。"
+
+msgctxt "footstrap"
+msgid "Please choose an image file."
+msgstr "请选择图片文件。"
+
+msgid "Please enter your username and password."
+msgstr "请输入用户名和密码。"
+
+msgctxt "footstrap"
+msgid "Recently visited"
+msgstr "最近访问"
+
+msgctxt "footstrap"
+msgid "Remove"
+msgstr "移除"
+
+msgctxt "footstrap"
+msgid "Reset to built-in"
+msgstr "恢复主题内置设置"
+
+msgctxt "footstrap"
+msgid "Reset to built-in — go back to the look the theme ships with."
+msgstr "恢复主题内置设置：使用主题自带的外观。"
+
+msgctxt "footstrap"
+msgid "Reset to router"
+msgstr "恢复路由器设置"
+
+msgctxt "footstrap"
+msgid "Reset to router — drop this browser's changes and follow the router."
+msgstr "恢复路由器设置：放弃当前浏览器的修改，使用路由器保存的外观。"
+
+msgctxt "footstrap"
+msgid "Rounding"
+msgstr "圆角"
+
+msgctxt "footstrap"
+msgid "Save to router"
+msgstr "保存到路由器"
+
+msgctxt "footstrap"
+msgid "Save to router — store this look on the router. Browsers with a look of their own keep it."
+msgstr "保存到路由器：将此外观存到路由器，已有独立外观设置的浏览器保持原样。"
+
+msgctxt "footstrap"
+msgid "Saved look"
+msgstr "已保存的外观"
+
+msgctxt "footstrap"
+msgid "Saved to router"
+msgstr "已保存到路由器"
+
+msgctxt "footstrap"
+msgid "Saving"
+msgstr "保存"
+
+msgctxt "footstrap"
+msgid "Scale"
+msgstr "缩放"
+
+msgid "Search"
+msgstr "搜索"
+
+msgctxt "footstrap"
+msgid "Search pages"
+msgstr "搜索页面"
+
+msgctxt "footstrap"
+msgid "Search pages…"
+msgstr "搜索页面…"
+
+msgctxt "footstrap"
+msgid "Sidebar"
+msgstr "侧栏"
+
+msgctxt "footstrap"
+msgid "Sidebar and bar"
+msgstr "侧栏与顶栏"
+
+msgid "Skip to content"
+msgstr "跳至正文"
+
+msgctxt "footstrap"
+msgid "Start typing to find a page"
+msgstr "输入内容以查找页面"
+
+msgid "Storage"
+msgstr "存储"
+
+msgctxt "footstrap"
+msgid "Strength"
+msgstr "强度"
+
+msgctxt "footstrap"
+msgid "Submenus"
+msgstr "子菜单"
+
+msgctxt "footstrap"
+msgid "Surfaces"
+msgstr "界面底色"
+
+msgid "Swap free"
+msgstr "可用交换空间"
+
+msgid "System"
+msgstr "系统"
+
+msgid "System running in recovery (initramfs) mode."
+msgstr "系统正在恢复（initramfs）模式下运行。"
+
+msgid "Table"
+msgstr "表格"
+
+msgctxt "footstrap"
+msgid "That SVG had nothing left once the unsafe parts were removed."
+msgstr "移除不安全内容后，SVG 中已无可用图形。"
+
+msgctxt "footstrap"
+msgid "That file could not be read."
+msgstr "无法读取该文件。"
+
+msgctxt "footstrap"
+msgid "That file is not a readable image."
+msgstr "该文件不是可读取的图片。"
+
+msgctxt "footstrap"
+msgid "That file is not an SVG image."
+msgstr "该文件不是 SVG 图片。"
+
+msgctxt "footstrap"
+msgid "That file is too large."
+msgstr "文件过大。"
+
+msgctxt "footstrap"
+msgid "That image is too large."
+msgstr "图片过大。"
+
+msgctxt "footstrap"
+msgid "The router refused to delete the file (ubus status %d)."
+msgstr "路由器拒绝删除文件（ubus 状态 %d）。"
+
+msgctxt "footstrap"
+msgid "Theme"
+msgstr "主题"
+
+msgid "There is no password set on this router. Please configure a root password to protect the web interface."
+msgstr "此路由器尚未设置密码，请配置 root 密码以保护管理界面。"
+
+msgctxt "footstrap"
+msgid "This browser is not storing preferences (site data is blocked), so a change here lasts until you reload. Saving as default still works and applies to every browser."
+msgstr "此浏览器禁止保存网站数据，因此这里的修改仅在刷新前有效。仍可保存默认设置，供所有浏览器使用。"
+
+msgctxt "footstrap"
+msgid "This theme is not translated on this router yet."
+msgstr "此路由器尚未安装该主题的翻译。"
+
+msgctxt "footstrap"
+msgid "Tint (router identification)"
+msgstr "识别色（区分路由器）"
+
+msgctxt "footstrap"
+msgid "Tint strength"
+msgstr "识别色强度"
+
+msgctxt "footstrap"
+msgid "Too faint to read %s"
+msgstr "过于模糊，无法阅读 %s"
+
+msgctxt "footstrap"
+msgid "Top"
+msgstr "顶部"
+
+msgid "Total Available"
+msgstr "总可用量"
+
+msgctxt "footstrap"
+msgid "Upload failed."
+msgstr "上传失败。"
+
+msgctxt "footstrap"
+msgid "Uploading…"
+msgstr "正在上传…"
+
+msgid "Username"
+msgstr "用户名"
+
+msgctxt "footstrap"
+msgid "Wallpaper"
+msgstr "壁纸"
+
+msgctxt "footstrap"
+msgid "Warning"
+msgstr "警告"
+
+msgid "You must enable JavaScript in your browser or LuCI will not work properly."
+msgstr "请在浏览器中启用 JavaScript，否则 LuCI 无法正常工作。"
+
+msgctxt "footstrap"
+msgid "in the sidebar"
+msgstr "在侧栏中"
+
+msgctxt "footstrap"
+msgid "on a card"
+msgstr "在卡片上"
+
+msgctxt "footstrap"
+msgid "on a control"
+msgstr "在控件上"
+
+msgctxt "footstrap"
+msgid "on the canvas"
+msgstr "在背景上"
+
+msgctxt "footstrap"
+msgid "the uploaded file could not be removed either; it is still on the router."
+msgstr "上传的文件也无法删除，文件仍保留在路由器上。"
+

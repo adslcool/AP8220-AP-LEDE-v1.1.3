@@ -1,0 +1,2 @@
+config ap 'core'
+	option schema '1'

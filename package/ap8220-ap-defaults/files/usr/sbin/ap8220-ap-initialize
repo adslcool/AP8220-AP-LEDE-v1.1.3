@@ -1,0 +1,262 @@
+#!/bin/sh
+# AP8220 AP 专用固件：仅首次安装/恢复出厂时配置网络与无线。
+set -eu
+
+AP_ROOT="${AP8220_TEST_ROOT:-}"
+if [ -n "$AP_ROOT" ] && [ "${AP8220_TEST_MODE:-0}" != "1" ]; then
+	echo "拒绝使用未显式启用的测试根目录。" >&2
+	exit 1
+fi
+UCI_BIN="${AP8220_UCI_BIN:-uci}"
+mkdir -p "$AP_ROOT/etc/config" "$AP_ROOT/tmp/.uci"
+u() { "$UCI_BIN" -c "$AP_ROOT/etc/config" -t "$AP_ROOT/tmp/.uci" "$@"; }
+log() {
+	if [ -z "$AP_ROOT" ]; then
+		logger -t ap8220-ap "$*"
+	fi
+	printf '%s\n' "$*"
+}
+
+[ -r "$AP_ROOT/usr/share/ap8220-ap/defaults.conf" ] || {
+	log "缺少 AP 默认参数，停止初始化。"
+	exit 1
+}
+# shellcheck disable=SC1091
+. "$AP_ROOT/usr/share/ap8220-ap/defaults.conf"
+
+board="$(cat "$AP_ROOT/tmp/sysinfo/board_name" 2>/dev/null || true)"
+[ "$board" = "aliyun,ap8220" ] || {
+	log "设备型号不匹配，未应用 AP8220 默认参数。"
+	exit 1
+}
+[ "$(u -q get ap8220_ap.core.initialized || true)" != "1" ] || exit 0
+
+# shellcheck disable=SC1091
+. "$AP_ROOT/lib/functions/ap8220-identity.sh"
+ap8220_load_identity || {
+	log "无法从本机 product_info 读取有效出厂 MAC，保留配置并停止初始化。"
+	exit 1
+}
+base_mac="$AP_BASE_MAC"
+mac_id="$(printf '%s' "$base_mac" | tr -d ':')"
+suffix="$(printf '%s' "$mac_id" | cut -c 7-12 | tr 'a-f' 'A-F')"
+
+if [ "$(u -q get ap8220_ap.core.base_configured || true)" != "1" ]; then
+	# 首次安装采用完整 AP 配置；后续本项目保留配置升级由 initialized 标记保护。
+	u -q revert network || true
+	cat > "$AP_ROOT/etc/config/network" <<EOF
+config interface 'loopback'
+	option device 'lo'
+	option proto 'static'
+	option ipaddr '127.0.0.1'
+	option netmask '255.0.0.0'
+
+config device 'br_lan'
+	option name 'br-lan'
+	option type 'bridge'
+	option macaddr '$base_mac'
+	list ports 'lan'
+	list ports 'wan'
+
+config device 'ap8220_port_lan'
+	option name 'lan'
+	option macaddr '$base_mac'
+
+config device 'ap8220_port_wan'
+	option name 'wan'
+	option macaddr '$AP_PRODUCT_MAC'
+
+config interface 'lan'
+	option device 'br-lan'
+	option proto 'dhcp'
+	option hostname '$HOSTNAME_PREFIX-$suffix'
+	option peerdns '1'
+	option delegate '0'
+	option ipv6 '0'
+
+config interface 'lan6'
+	option device '@lan'
+	option proto 'dhcpv6'
+	option reqaddress 'try'
+	option reqprefix 'no'
+	option delegate '0'
+EOF
+	chmod 600 "$AP_ROOT/etc/config/network"
+
+	# 镜像不安装 DHCP/RA 服务端；额外保留禁用配置便于后续手动装包时保持 AP 行为。
+	cat > "$AP_ROOT/etc/config/dhcp" <<'EOF'
+config dhcp 'lan'
+	option interface 'lan'
+	option ignore '1'
+	option dhcpv6 'disabled'
+	option ra 'disabled'
+	option ndp 'disabled'
+EOF
+	cat > "$AP_ROOT/etc/config/firewall" <<'EOF'
+config defaults
+	option input 'ACCEPT'
+	option output 'ACCEPT'
+	option forward 'REJECT'
+	option synflood_protect '1'
+	option flow_offloading '0'
+	option flow_offloading_hw '0'
+
+config zone 'lan'
+	option name 'lan'
+	list network 'lan'
+	list network 'lan6'
+	option input 'ACCEPT'
+	option output 'ACCEPT'
+	option forward 'ACCEPT'
+	option masq '0'
+	option mtu_fix '0'
+EOF
+	u set "system.@system[0].hostname=$HOSTNAME_PREFIX-$suffix"
+	u set "system.@system[0].timezone=$TIMEZONE"
+	u set "system.@system[0].zonename=$ZONENAME"
+	u set "system.@system[0].description=AP8220 AP专用固件"
+	if u -q get system.ntp >/dev/null; then
+		u set system.ntp.enable_server='0'
+	fi
+	u commit system
+
+	[ -f "$AP_ROOT/etc/shadow" ] || {
+		log "未找到系统密码文件，停止初始化。"
+		exit 1
+	}
+	awk -F: -v OFS=: -v hash="$ROOT_PASSWORD_HASH" '
+		$1 == "root" { $2 = hash; found = 1 }
+		{ print }
+		END { if (!found) exit 1 }
+	' "$AP_ROOT/etc/shadow" > "$AP_ROOT/etc/shadow.ap-new"
+	chmod 600 "$AP_ROOT/etc/shadow.ap-new"
+	mv "$AP_ROOT/etc/shadow.ap-new" "$AP_ROOT/etc/shadow"
+
+	touch "$AP_ROOT/etc/config/turboacc"
+	u set turboacc.global=turboacc
+	u set turboacc.global.set='1'
+	u set turboacc.config=turboacc
+	u set turboacc.config.fastpath='qca_nss_ecm'
+	u set turboacc.config.fullcone='0'
+	u set turboacc.config.tcpcca='cubic'
+	u commit turboacc
+
+	if u -q get luci.main >/dev/null; then
+		u set luci.main.lang='zh_cn'
+		u set luci.main.mediaurlbase='/luci-static/footstrap'
+		u commit luci
+	fi
+	if [ -z "$AP_ROOT" ]; then
+		for service in dnsmasq odhcpd; do
+			[ ! -x "/etc/init.d/$service" ] || "/etc/init.d/$service" disable
+		done
+	fi
+	u set ap8220_ap.core=ap
+	u set "ap8220_ap.core.base_mac=$base_mac"
+	u set "ap8220_ap.core.product_mac=$AP_PRODUCT_MAC"
+	u set ap8220_ap.core.identity_source='product_info:product.mac+1'
+	u set ap8220_ap.core.identity_schema='2'
+	u set ap8220_ap.core.base_configured='1'
+	u commit ap8220_ap
+	log "双有线口桥接与 DHCP 管理地址配置完成。"
+fi
+
+# kmodloader 后通常已经能生成无线配置；晚启动服务会对尚未出现的无线设备重试。
+if [ -z "$AP_ROOT" ] && [ -x /sbin/wifi ]; then
+	/sbin/wifi config >/dev/null 2>&1 || true
+fi
+radio_2g=''
+radio_5g=''
+for section in $(u -q show wireless 2>/dev/null | sed -n 's/^\(wireless\.[^.]*\)=wifi-device$/\1/p'); do
+	band="$(u -q get "$section.band" || true)"
+	if [ -z "$band" ]; then
+		case "$(u -q get "$section.hwmode" || true)" in
+			11g) band='2g' ;;
+			11a) band='5g' ;;
+		esac
+	fi
+	case "$band" in
+		2g)
+			[ -z "$radio_2g" ] || { log "检测到多个 2.4GHz 无线设备，停止自动配置。"; exit 1; }
+			radio_2g="$section"
+			;;
+		5g)
+			[ -z "$radio_5g" ] || { log "检测到多个 5GHz 无线设备，停止自动配置。"; exit 1; }
+			radio_5g="$section"
+			;;
+	esac
+done
+if [ -z "$radio_2g" ] || [ -z "$radio_5g" ]; then
+	log "无线频段尚未准备完成，稍后重试；不会按 radio 编号猜测频段。"
+	exit 1
+fi
+
+for section in $(u -q show wireless | sed -n 's/^\(wireless\.[^.]*\)=wifi-iface$/\1/p'); do
+	u delete "$section"
+done
+
+configure_radio() {
+	radio="$1"
+	band="$2"
+	ssid="$3"
+	channel="$4"
+	htmode="$5"
+	domain="$6"
+	iface="wireless.ap$band"
+	u set "$radio.disabled=0"
+	u set "$radio.country=$COUNTRY"
+	u set "$radio.channel=$channel"
+	u set "$radio.htmode=$htmode"
+	u set "$radio.acs_exclude_dfs=1"
+	u set "$iface=wifi-iface"
+	u set "$iface.device=$(printf '%s' "$radio" | cut -d. -f2)"
+	u set "$iface.mode=ap"
+	u set "$iface.network=lan"
+	u set "$iface.ssid=$ssid"
+	u set "$iface.encryption=psk2+ccmp"
+	u set "$iface.key=$WIFI_PASSWORD"
+	u set "$iface.disabled=0"
+	u set "$iface.isolate=0"
+	u set "$iface.ieee80211w=1"
+	u set "$iface.ieee80211k=1"
+	u set "$iface.rrm_neighbor_report=1"
+	u set "$iface.rrm_beacon_report=1"
+	u set "$iface.bss_transition=1"
+	u set "$iface.ieee80211r=$IEEE80211R"
+	u set "$iface.mobility_domain=$domain"
+	u set "$iface.ft_over_ds=0"
+	u set "$iface.ft_psk_generate_local=1"
+	u set "$iface.nasid=$mac_id-$band"
+	u set "$iface.disassoc_low_ack=0"
+	u set "$iface.wps_pushbutton=0"
+}
+configure_radio "$radio_2g" '2g' "$SSID_2G" "$CHANNEL_2G" "$HTMODE_2G" "$MOBILITY_DOMAIN_2G"
+configure_radio "$radio_5g" '5g' "$SSID_5G" "$CHANNEL_5G" "$HTMODE_5G" "$MOBILITY_DOMAIN_5G"
+u commit wireless
+
+cat > "$AP_ROOT/etc/config/usteer" <<EOF
+# AP8220 AP 专用固件：共享邻居信息，使用温和策略。
+config usteer 'main'
+	option network 'lan'
+	option syslog '1'
+	option local_mode '0'
+	option ipv6 '0'
+	option debug_level '1'
+	option aggressiveness '1'
+	option assoc_steering '0'
+	option probe_steering '0'
+	option min_connect_snr '0'
+	option min_snr '0'
+	option load_kick_enabled '0'
+	option roam_trigger_snr '0'
+	option roam_scan_timeout '60000'
+	option band_steering_interval '0'
+	list ssid_list '$SSID_2G'
+EOF
+if [ "$SSID_5G" != "$SSID_2G" ]; then
+	printf "\tlist ssid_list '%s'\n" "$SSID_5G" >> "$AP_ROOT/etc/config/usteer"
+fi
+u set ap8220_ap.core.initialized='1'
+u set "ap8220_ap.core.initialized_source=$SOURCE_VERSION"
+u commit ap8220_ap
+log "无线、802.11k/v/r、usteer 与 Turboacc NSS ECM 配置完成。"

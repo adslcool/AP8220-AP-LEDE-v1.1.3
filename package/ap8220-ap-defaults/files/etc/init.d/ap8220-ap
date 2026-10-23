@@ -1,0 +1,23 @@
+#!/bin/sh /etc/rc.common
+# shellcheck shell=ash
+# 对首次启动时尚未就绪的无线设备进行有限重试。
+START=95
+STOP=10
+
+start() {
+	/usr/sbin/ap8220-ap-migrate || return 1
+	[ "$(uci -q get ap8220_ap.core.initialized)" != "1" ] || return 0
+	local attempt=0
+	while [ "$attempt" -lt 15 ]; do
+		if /usr/sbin/ap8220-ap-initialize; then
+			ubus call network reload >/dev/null 2>&1 || true
+			/etc/init.d/usteer restart >/dev/null 2>&1 || true
+			/etc/init.d/turboacc restart >/dev/null 2>&1 || true
+			return 0
+		fi
+		attempt=$((attempt + 1))
+		sleep 2
+	done
+	logger -t ap8220-ap "首次初始化尚未完成，可查看 logread -e ap8220-ap；下次启动继续重试。"
+	return 1
+}

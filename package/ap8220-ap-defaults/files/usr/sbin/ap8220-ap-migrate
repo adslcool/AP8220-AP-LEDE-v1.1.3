@@ -1,0 +1,80 @@
+#!/bin/sh
+# 只迁移本项目旧版自动生成的设备身份，不重置网络和无线参数。
+set -eu
+AP_ROOT="${AP8220_TEST_ROOT:-}"
+[ -z "$AP_ROOT" ] || [ "${AP8220_TEST_MODE:-0}" = 1 ] || exit 1
+UCI_BIN="${AP8220_UCI_BIN:-uci}"
+u() { "$UCI_BIN" -c "$AP_ROOT/etc/config" -t "$AP_ROOT/tmp/.uci" "$@"; }
+log() {
+    [ -n "$AP_ROOT" ] || logger -t ap8220-ap "$*"
+    printf '%s\n' "$*"
+}
+[ "$(cat "$AP_ROOT/tmp/sysinfo/board_name" 2>/dev/null || true)" = 'aliyun,ap8220' ] || exit 1
+[ "$(u -q get ap8220_ap.core.identity_schema || true)" != 2 ] || exit 0
+[ "$(u -q get ap8220_ap.core.base_configured || true)" = 1 ] || exit 0
+# shellcheck disable=SC1091
+. "$AP_ROOT/lib/functions/ap8220-identity.sh"
+# shellcheck disable=SC1091
+. "$AP_ROOT/usr/share/ap8220-ap/defaults.conf"
+ap8220_load_identity || { log '出厂 MAC 读取失败，未修改现有设备身份。'; exit 1; }
+old="$(ap8220_valid_mac "$(u -q get ap8220_ap.core.base_mac || true)")" || {
+    log '旧版设备身份无效，保留现有配置，请人工核对。'; exit 1
+}
+bridge="$(u -q get network.br_lan.macaddr || true)"
+[ "$bridge" = "$old" ] || {
+    log '桥接 MAC 已由用户修改，跳过自动迁移并保留现有配置。'
+    exit 0
+}
+backup="$AP_ROOT/etc/ap8220-identity-backup"
+if [ ! -d "$backup" ]; then
+    stage="$(mktemp -d "$backup.XXXXXX")"
+    for name in network wireless system ap8220_ap; do
+        if [ -f "$AP_ROOT/etc/config/$name" ]; then
+            cp "$AP_ROOT/etc/config/$name" "$stage/$name"
+            chmod 600 "$stage/$name"
+        fi
+    done
+    mv "$stage" "$backup"
+fi
+old_id="$(printf '%s' "$old" | tr -d ':')"
+new_id="$(printf '%s' "$AP_BASE_MAC" | tr -d ':')"
+old_suffix="$(printf '%s' "$old_id" | cut -c 7-12 | tr 'a-f' 'A-F')"
+new_suffix="$(printf '%s' "$new_id" | cut -c 7-12 | tr 'a-f' 'A-F')"
+for key in 'system.@system[0].hostname' network.lan.hostname; do
+    if [ "$(u -q get "$key" || true)" = "$HOSTNAME_PREFIX-$old_suffix" ]; then
+        u set "$key=$HOSTNAME_PREFIX-$new_suffix"
+    fi
+done
+for band in 2g 5g; do
+    if [ "$(u -q get "wireless.ap$band.nasid" || true)" = "$old_id-$band" ]; then
+        u set "wireless.ap$band.nasid=$new_id-$band"
+    fi
+done
+u set "network.br_lan.macaddr=$AP_BASE_MAC"
+# 已有按端口配置的 MAC 尊重用户设置；旧版无端口条目时补充出厂地址。
+for port in lan wan; do
+    found=0
+    for section in $(u -q show network | sed -n 's/^\(network\.[^.]*\)=device$/\1/p'); do
+        if [ "$(u -q get "$section.name" || true)" = "$port" ]; then found=1; break; fi
+    done
+    if [ "$found" = 0 ]; then
+        section="network.ap8220_port_$port"
+        if ! u -q get "$section" >/dev/null; then
+            u set "$section=device"
+            u set "$section.name=$port"
+            value="$AP_PRODUCT_MAC"
+            [ "$port" != lan ] || value="$AP_BASE_MAC"
+            u set "$section.macaddr=$value"
+        fi
+    fi
+done
+u set "ap8220_ap.core.base_mac=$AP_BASE_MAC"
+u set "ap8220_ap.core.product_mac=$AP_PRODUCT_MAC"
+u set ap8220_ap.core.identity_source='product_info:product.mac+1'
+u set ap8220_ap.core.identity_schema='2'
+u set ap8220_ap.core.identity_migrated='1'
+for name in network wireless system ap8220_ap; do u commit "$name"; done
+if [ -z "$AP_ROOT" ] && ubus -t 2 call network.interface.lan status >/dev/null 2>&1; then
+    ubus call network reload >/dev/null 2>&1 || true
+fi
+log '出厂 MAC 迁移完成，主路由可能为 AP 分配新的管理 IP。'

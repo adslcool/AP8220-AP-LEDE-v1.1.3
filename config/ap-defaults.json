@@ -1,0 +1,17 @@
+{
+  "country": "CN",
+  "timezone": "CST-8",
+  "zonename": "Asia/Shanghai",
+  "hostname_prefix": "AP8220",
+  "root_password": "password",
+  "ssid_2g": "Home-WiFi",
+  "ssid_5g": "Home-WiFi",
+  "wifi_password": "12345678",
+  "channel_2g": "1",
+  "channel_5g": "36",
+  "htmode_2g": "HE20",
+  "htmode_5g": "HE80",
+  "mobility_domain_2g": "a1b2",
+  "mobility_domain_5g": "a1b2",
+  "ieee80211r": true
+}

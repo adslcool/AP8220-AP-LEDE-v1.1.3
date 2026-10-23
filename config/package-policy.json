@@ -1,0 +1,40 @@
+{
+  "required": [
+    "ap8220-ap-defaults", "luci-base", "luci-mod-admin-full",
+    "luci-app-package-manager", "luci-theme-argon",
+    "luci-theme-footstrap", "luci-i18n-footstrap-zh-cn",
+    "luci-app-turboacc", "luci-i18n-turboacc-zh-cn",
+    "luci-app-usteer", "luci-i18n-usteer-zh-cn",
+    "luci-i18n-base-zh-cn", "usteer", "wpad-openssl",
+    "ipq-wifi-aliyun_ap8220", "ath11k-firmware-ipq8074",
+    "nss-firmware-ipq8074", "kmod-ath11k-ahb",
+    "kmod-qca-nss-dp", "kmod-qca-nss-drv", "kmod-qca-nss-ecm",
+    "kmod-qca-nss-drv-bridge-mgr", "kmod-qca-ssdk",
+    "uhttpd", "uhttpd-mod-ubus", "libustream-openssl",
+    "openssl-util", "firewall4", "odhcp6c", "ip-full",
+    "iw", "iwinfo", "ethtool", "tcpdump-mini", "openssh-sftp-server",
+    "fwtool", "uboot-envtools", "jsonfilter"
+  ],
+  "forbidden": [
+    "luci", "luci-light", "luci-theme-bootstrap", "luci-app-argon-config",
+    "default-settings", "luci-app-openclash", "luci-app-ssr-plus",
+    "luci-app-passwall", "luci-app-passwall2", "xray-core", "mihomo",
+    "tailscale", "zerotier", "luci-app-upnp", "miniupnpd",
+    "miniupnpd-nftables", "luci-app-ddns", "luci-app-vlmcsd", "vlmcsd",
+    "luci-app-vsftpd", "vsftpd", "luci-app-autoreboot",
+    "luci-app-nlbwmon", "nlbwmon", "luci-app-wol", "dawn", "luci-app-dawn",
+    "dnsmasq", "dnsmasq-full", "odhcpd", "odhcpd-ipv6only",
+    "ppp", "ppp-mod-pppoe", "wpad-basic", "wpad-basic-openssl",
+    "wpad-basic-mbedtls", "wpad-mini", "wpad-mbedtls", "wpad-wolfssl",
+    "libustream-mbedtls", "libustream-wolfssl",
+    "kmod-fast-classifier", "kmod-shortcut-fe-cm", "kmod-ipt-offload"
+  ],
+  "required_flags": [
+    "CONFIG_TARGET_qualcommax",
+    "CONFIG_TARGET_qualcommax_ipq807x",
+    "CONFIG_TARGET_qualcommax_ipq807x_DEVICE_aliyun_ap8220",
+    "CONFIG_ATH11K_NSS_SUPPORT",
+    "CONFIG_PACKAGE_MAC80211_NSS_SUPPORT",
+    "CONFIG_PACKAGE_TURBOACC_INCLUDE_NO_FASTPATH"
+  ]
+}
