@@ -1,0 +1,32 @@
+name: 检查 AP8220 AP 专用固件源码
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    name: 版本、配置、脚本和初始化测试
+    runs-on: ubuntu-24.04
+    steps:
+      - name: 检出本项目源码
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1，Node.js 24
+        with:
+          persist-credentials: false
+      - name: 安装检查工具
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck python3-yaml cmake pkg-config libjson-c-dev
+      - name: 构建测试用原生 UCI
+        run: python3 scripts/native_uci.py --output work/native-uci
+      - name: 执行源码和测试检查
+        env:
+          AP8220_NATIVE_UCI: ${{ github.workspace }}/work/native-uci/bin/uci
+          LD_LIBRARY_PATH: ${{ github.workspace }}/work/native-uci/lib
+        run: |
+          python3 scripts/check_source.py
+          python3 -m unittest discover -s tests -v
